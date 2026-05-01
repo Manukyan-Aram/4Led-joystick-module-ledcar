@@ -1,0 +1,55 @@
+#include <espnow.h>
+#include <ESP8266WiFi.h>
+
+// LED փիները
+const int d1 = D1;
+const int d2 = D2;
+const int d3 = D3;
+const int d4 = D4;
+
+typedef struct struct_message {
+  bool l1, l2, l3, l4, l5;
+} struct_message;
+
+struct_message incomingData;
+
+void onDataRecv(uint8_t * mac, uint8_t *incomingBytes, uint8_t len) {
+  memcpy(&incomingData, incomingBytes, sizeof(incomingData));
+
+  if (incomingData.l1) {
+    analogWrite(d1, 1023); analogWrite(d2, 0); 
+    analogWrite(d3, 0);    analogWrite(d4, 1023);
+  } 
+  else if (incomingData.l2) {
+    analogWrite(d1, 0);    analogWrite(d2, 1023); 
+    analogWrite(d3, 1023); analogWrite(d4, 0);
+  }
+  else if (incomingData.l3) {
+    analogWrite(d1, 400); analogWrite(d2, 0); 
+    analogWrite(d3, 400); analogWrite(d4, 0);
+  }
+  else if (incomingData.l4) {
+    analogWrite(d1, 0);   analogWrite(d2, 400); 
+    analogWrite(d3, 0);   analogWrite(d4, 400);
+  }
+  else if (incomingData.l5) {
+    analogWrite(d1, 0); analogWrite(d2, 0); 
+    analogWrite(d3, 0); analogWrite(d4, 0);
+  }
+}
+
+void setup() {
+  WiFi.mode(WIFI_STA);
+  if (esp_now_init() != 0) return;
+
+  pinMode(d1, OUTPUT);
+  pinMode(d2, OUTPUT);
+  pinMode(d3, OUTPUT);
+  pinMode(d4, OUTPUT);
+
+  esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
+  esp_now_register_recv_cb(onDataRecv);
+}
+
+void loop() {
+}
