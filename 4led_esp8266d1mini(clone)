@@ -8,7 +8,7 @@ const int d3 = D3;
 const int d4 = D4;
 
 typedef struct struct_message {
-  bool l1, l2, l3, l4, l5;
+  bool l1, l2, l3, l4, l5, l6, l7, l8, l9;
 } struct_message;
 
 struct_message incomingData;
@@ -25,14 +25,30 @@ void onDataRecv(uint8_t * mac, uint8_t *incomingBytes, uint8_t len) {
     analogWrite(d3, 1023); analogWrite(d4, 0);
   }
   else if (incomingData.l3) {
-    analogWrite(d1, 400); analogWrite(d2, 0); 
-    analogWrite(d3, 400); analogWrite(d4, 0);
+    analogWrite(d1, 200); analogWrite(d2, 0); 
+    analogWrite(d3, 200); analogWrite(d4, 0);
   }
   else if (incomingData.l4) {
-    analogWrite(d1, 0);   analogWrite(d2, 400); 
-    analogWrite(d3, 0);   analogWrite(d4, 400);
+    analogWrite(d1, 0);   analogWrite(d2, 200); 
+    analogWrite(d3, 0);   analogWrite(d4, 200);
   }
-  else if (incomingData.l5) {
+  else if (incomingData.l5) { // Ձեր տեքստում երկրորդ 4-ի փոխարեն սովորաբար 3-ն է լինում
+    analogWrite(d1, 200); analogWrite(d2, 0);
+    analogWrite(d3, 0);    analogWrite(d4, 1023);
+  }
+  else if (incomingData.l6) {
+    analogWrite(d1, 1023);   analogWrite(d2, 0);
+    analogWrite(d3, 0);   analogWrite(d4, 200);
+  }
+  else if (incomingData.l7) { // Ձեր տեքստում երկրորդ 4-ի փոխարեն սովորաբար 3-ն է լինում
+    analogWrite(d1, 0); analogWrite(d2, 200);
+    analogWrite(d3, 1023);    analogWrite(d4, 0);
+  }
+  else if (incomingData.l8) {
+    analogWrite(d1, 0);   analogWrite(d2, 1023);
+    analogWrite(d3, 200);   analogWrite(d4, 0);
+  }
+  else if (incomingData.l9) {
     analogWrite(d1, 0); analogWrite(d2, 0); 
     analogWrite(d3, 0); analogWrite(d4, 0);
   }
