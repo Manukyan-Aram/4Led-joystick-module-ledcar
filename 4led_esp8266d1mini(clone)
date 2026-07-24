@@ -16,37 +16,37 @@ struct_message incomingData;
 void onDataRecv(uint8_t * mac, uint8_t *incomingBytes, uint8_t len) {
   memcpy(&incomingData, incomingBytes, sizeof(incomingData));
 
-  if (incomingData.l1) {
-    analogWrite(d1, 1023); analogWrite(d2, 0); 
-    analogWrite(d3, 0);    analogWrite(d4, 1023);
-  } 
-  else if (incomingData.l2) {
-    analogWrite(d1, 0);    analogWrite(d2, 1023); 
-    analogWrite(d3, 1023); analogWrite(d4, 0);
-  }
-  else if (incomingData.l3) {
-    analogWrite(d1, 200); analogWrite(d2, 0); 
-    analogWrite(d3, 200); analogWrite(d4, 0);
-  }
-  else if (incomingData.l4) {
-    analogWrite(d1, 0);   analogWrite(d2, 200); 
-    analogWrite(d3, 0);   analogWrite(d4, 200);
-  }
-  else if (incomingData.l5) { // Ձեր տեքստում երկրորդ 4-ի փոխարեն սովորաբար 3-ն է լինում
-    analogWrite(d1, 200); analogWrite(d2, 0);
-    analogWrite(d3, 0);    analogWrite(d4, 1023);
-  }
-  else if (incomingData.l6) {
-    analogWrite(d1, 1023);   analogWrite(d2, 0);
-    analogWrite(d3, 0);   analogWrite(d4, 200);
-  }
-  else if (incomingData.l7) { // Ձեր տեքստում երկրորդ 4-ի փոխարեն սովորաբար 3-ն է լինում
-    analogWrite(d1, 0); analogWrite(d2, 200);
+  if (incomingData.l1) { //forward
+    analogWrite(d1, 0); analogWrite(d2, 1023); 
     analogWrite(d3, 1023);    analogWrite(d4, 0);
+  } 
+  else if (incomingData.l2) { //backward
+    analogWrite(d1, 1023);    analogWrite(d2, 0); 
+    analogWrite(d3, 0); analogWrite(d4, 1023);
   }
-  else if (incomingData.l8) {
-    analogWrite(d1, 0);   analogWrite(d2, 1023);
+  else if (incomingData.l3) {  //right 
+    analogWrite(d1, 0); analogWrite(d2, 200); 
+    analogWrite(d3, 0); analogWrite(d4, 200);
+  }
+  else if (incomingData.l4) { //left
+    analogWrite(d1, 200);   analogWrite(d2, 0); 
     analogWrite(d3, 200);   analogWrite(d4, 0);
+  }
+  else if (incomingData.l5) { //for right
+    analogWrite(d1, 0); analogWrite(d2, 1023);
+    analogWrite(d3, 100);    analogWrite(d4, 0);
+  }
+  else if (incomingData.l6) { //for left
+    analogWrite(d1, 0);   analogWrite(d2, 100);
+    analogWrite(d3, 1023);   analogWrite(d4, 0);
+  }
+  else if (incomingData.l7) { //back right
+    analogWrite(d1, 1023); analogWrite(d2, 0);
+    analogWrite(d3, 0);    analogWrite(d4, 100);
+  }
+  else if (incomingData.l8) { //back left
+    analogWrite(d1, 100);   analogWrite(d2, 0);
+    analogWrite(d3, 0);   analogWrite(d4, 1023);
   }
   else if (incomingData.l9) {
     analogWrite(d1, 0); analogWrite(d2, 0); 
