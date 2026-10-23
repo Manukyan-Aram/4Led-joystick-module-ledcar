@@ -1,0 +1,89 @@
+#include <esp_now.h>
+#include <WiFi.h>
+
+uint8_t broadcastAddress[] = { 0x24, 0x4C, 0xAB, 0x48, 0x86, 0xE4 };
+
+const int pot1 = 34;  // x
+const int pot2 = 35;  // y
+
+typedef struct struct_message {
+  bool l1_slow; // Առաջ դանդաղ
+  bool l1_fast; // Առաջ արագ
+  bool l2, l3, l4, l5, l6, l7, l8, l9;
+} struct_message;
+
+struct_message myData;
+struct_message lastData; 
+esp_now_peer_info_t peerInfo;
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+
+  if (esp_now_init() != ESP_OK) return;
+
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = 1; 
+  peerInfo.encrypt = false;
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) return;
+}
+
+void loop() {
+  int x = analogRead(pot1);
+  int y = analogRead(pot2);
+
+  // Ամեն ինչ սկզբից զրոյացնում ենք
+  myData.l1_slow = false;
+  myData.l1_fast = false;
+  myData.l2 = myData.l3 = myData.l4 = myData.l5 = myData.l6 = myData.l7 = myData.l8 = myData.l9 = false;
+
+  // Ստեղծում ենք հստակ գոտիներ
+  bool xLow  = (x < 1500);
+  bool xHigh = (x > 2500);
+  bool xMid  = (x >= 1500 && x <= 2500);
+
+  bool yLow          = (y < 1500);
+  bool yMid          = (y >= 1500 && y <= 2500);
+  bool ySlowForward  = (y > 2500 && y <= 3700); // Միջին հրում՝ դանդաղ
+  bool yFastForward  = (y > 3700);              // Լրիվ հրում՝ արագ
+
+  // Պայմանների ստուգում
+  if (ySlowForward && xMid) {
+    myData.l1_slow = true; // Առաջ դանդաղ
+  } 
+  else if (yFastForward && xMid) {
+    myData.l1_fast = true; // Առաջ արագ
+  } 
+  else if (yLow && xMid) {
+    myData.l2 = true; // Ետ (Backward)
+  } 
+  else if (xHigh && yMid) {
+    myData.l3 = true; // Աջ (Right)
+  } 
+  else if (xLow && yMid) {
+    myData.l4 = true; // Ձախ (Left)
+  } 
+  else if (xHigh && (ySlowForward || yFastForward)) {
+    myData.l5 = true; // Առաջ-Աջ (անկյուն)
+  } 
+  else if (xLow && (ySlowForward || yFastForward)) {
+    myData.l6 = true; // Առաջ-Ձախ (անկյուն)
+  } 
+  else if (xHigh && yLow) {
+    myData.l7 = true; // Ետ-Աջ (անկյուն)
+  } 
+  else if (xLow && yLow) {
+    myData.l8 = true; // Ետ-Ձախ (անկյուն)
+  } 
+  else if (xMid && yMid) {
+    myData.l9 = true; // Մեջտեղ / Հանգիստ վիճակ (Center)
+  }
+
+  // Ուղարկել միայն եթե տվյալը փոխվել է
+  if (memcmp(&myData, &lastData, sizeof(myData)) != 0) {
+    esp_now_send(broadcastAddress, (uint8_t *)&myData, sizeof(myData));
+    memcpy(&lastData, &myData, sizeof(myData)); 
+  }
+
+  delay(50); 
+}
